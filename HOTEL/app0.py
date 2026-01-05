@@ -33,7 +33,9 @@ def adding():
         details[user]=[pasw,n]
         return render_template('hotelloginpage.html',mes='')
 
-app.run(debug=True)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))  # Use PORT from environment, fallback to 5000 locally
+    app.run(host="0.0.0.0", port=port)
 
 
 
