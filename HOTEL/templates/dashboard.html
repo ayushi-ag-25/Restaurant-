@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        body {
+            background: url('/static/tile.png') fixed;
+        }
+
+        .page {
+            margin: 30px;
+            border-radius: 10px;
+            height: 100vh;
+            background-color: rgb(191, 182, 182);
+        }
+
+        .cont1 {
+            padding: 0px;
+            height: 90vh;
+        }
+
+        .concon {
+            display: flex;
+            justify-content: center;
+        }
+
+        .leftbar {
+            padding: 0px;
+            flex: 15%;
+            height: 240px;
+            border-radius: 10px 0px 0px 10px;
+            background-color: rgb(142, 137, 137);
+        }
+
+        .rightbar {
+            padding: 0px;
+            flex: 90%;
+        }
+
+        .up {
+            padding: 10px;
+            border: 1px solid black;
+            background: url('/static/cc3.png') no-repeat;
+            background-size: cover;
+            color: white;
+            height: 220px;
+            display: flex;
+            gap: 120px;
+        }
+
+        .atlef {
+            margin: 10px 0px 0px 500px;
+            font-size: 40px;
+            font-family: gabriola;
+        }
+        .btn:hover{
+            cursor: pointer;
+            box-shadow:0px 0px 20px;
+            transform: scale(1.05);
+        }
+
+        .btn {
+            height: 80px;
+            width: 200px;
+            font-size: 20px;
+            background: black;
+            color: white;
+            border-radius: 20px;
+            box-shadow: 10px 0px 10px;
+            margin: 30px 0px;
+            transition: all 0.1s ease-in-out;
+        }
+
+        .item {
+            padding: 10px;
+            font-size: 20px;
+            height: 30px;
+            background: linear-gradient(rgb(211, 203, 166), rgb(138, 59, 59));
+            transition: all 0.1s ease-in;
+        }
+
+        .item:hover {
+            height: 40px;
+            transform: scaleX(1.05);
+        }
+
+        .img {
+            height: inherit;
+        }
+
+        .main {
+            margin: 0px 20px;
+            width: inherit;
+            padding: 30px;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .book {
+            border-radius: 20px;
+            display: flex;
+            box-shadow:10px 10px 10px;
+            height: 180px;
+            border: 1 px solid black;
+            background: linear-gradient(grey, white);
+            transition: 0.1s all ease-in-out;
+        }
+
+        .image {
+            flex: 30%;
+            border-radius: 20px 0px 0px 20px;
+        }
+
+        .content {
+            font-family: sans-serif;
+            flex: 70%;
+            padding: 20px;
+        }
+
+        .price {
+            font-family: forte;
+
+        }
+
+        .content h2 {
+            font-family: gabriola;
+            text-shadow: 10px 5px 10px;
+        }
+
+        .content p {
+            margin: 5px;
+            color: black;
+            font-weight: bold;
+        }
+
+        .book:hover {
+            transform: scale(1.02);
+            box-shadow:0px 0px 0px;
+        }
+        .mn{
+            display:flex;
+            gap:100px;
+        }
+        .bkbtn {
+            float: right;
+            padding: 10px;
+            background:transparent;
+            font-weight: bolder;
+            border: 0;
+            color: black;
+            font-size: 18px;
+            margin-left: auto;
+            margin-top:auto;
+            transition:all 0.1s ease-in-out;
+        }
+        .bkbtn:hover{
+            cursor:pointer;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <div class="cont1">
+            <div class="concon">
+                <div class="leftbar">
+                    <div class="profile item">Profile</div>
+                    <div class="his item">History</div>
+                    <div class="feed item">Feedback</div>
+                    <div class="logout item">Logout</div>
+                </div>
+                <div class="rightbar">
+                    <div class="up">
+                        <div class="atlef">
+                            <h1>Hi {{name}} !</h1>
+                            <p>Atithi devo bhavha!</p>
+                        </div>
+                        <div class="atright">
+                            <button class="btn">Book a table</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main">
+                <div class="options">
+                    <div class="book o1">
+                        <img src="/static/cas.jpg" class="image">
+                        <div class="content">
+                            <h2>Casual Dinner tables</h2>
+                            <p>
+                                Enjoy a relaxed and comfortable dining experience with warm lighting and thoughtfully
+                                arranged tables.
+                                Ideal for family dinners, date nights, and small celebrations.
+                            </p>
+                            <div class="mn">
+                                <div class="price">₹200 / table</div>
+                                <button class="bkbtn">&#8599;</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="book o2">
+                        <img src="/static/met.jpg" class="image">
+                        <div class="content">
+                            <h2>Guest Meetings</h2>
+                            <p>
+                                A quiet and professional environment designed for focused discussions, interviews, and
+                                meetings.
+                                Comfortable seating with minimal distractions.
+                            </p>
+                            <div class="mn">
+                                <div class="price">₹500 / table</div>
+                                <button class="bkbtn">&nearr;</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="book o3">
+                        <img src="/static/rof.gif" class="image">
+                        <div class="content">
+                            <h2>Rooftop Party</h2>
+                            <p>
+                                A quiet and professional environment designed for focused discussions, interviews, and
+                                meetings.
+                                Comfortable seating with minimal distractions.
+                            </p>
+                            <div class="mn">
+                                <div class="price">₹1000 / table</div>
+                                <button class="bkbtn">&nearr;</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="book o4">
+                        <img src="/static/f.jpg" class="image">
+                        <div class="content">
+                            <h2>Function halls</h2>
+                            <p>
+                                A stylish open-air rooftop with ambient lighting and a vibrant nightlife vibe.
+                                Ideal for private parties, birthdays, and evening celebrations.
+                            </p>
+                            <div class="mn">
+                                <div class="price">₹2500 / table</div>
+                                <button class="bkbtn">&nearr;</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
