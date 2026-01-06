@@ -1,0 +1,185 @@
+body {
+    font-size: 20px;
+    background-color: grey;
+    margin: auto;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#page1 {
+    width: 100%;
+    height: 100vh;
+}
+
+.sec1 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: aliceblue;
+    height: 25vh;
+    display: flex;
+}
+
+.navbar {
+    margin-right: 150px;
+    margin-left: auto;
+    display: flex;
+    gap: 20px;
+}
+
+.navbar>a {
+    text-decoration: none;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0px 20px;
+    font-weight: bold;
+    height: 50px;
+    color: black;
+    background-color: rgb(210, 209, 209);
+
+}
+
+.htlnm {
+    margin: 0px 50px;
+    font-size: 4em;
+    text-decoration: wavy;
+    font-weight: bolder;
+    font-family: algerian;
+}
+
+.pg1body {
+    padding: 20px;
+    height: 73vh;
+    width: 98%;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://i.pinimg.com/736x/77/6d/1a/776d1a5b28fe5858e1ed5983c992bc61.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+
+.lar {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    color: white;
+    text-align: center;
+    font-size: 70px;
+    ;
+}
+
+.tex {
+    font-weight: bold;
+    margin-top: 10px;
+    font-size: 20px;
+    font-style: italic;
+    text-align: center;
+}
+
+.btn1 {
+    padding: 20px;
+    margin: 25px 0px;
+    margin-left: 37%;
+    text-align: center;
+    border: 2px solid red;
+    border-radius: 20px;
+    background-color: rgb(160, 43, 43);
+    font-weight: bold;
+    color: white;
+    font-size: 20px;
+    transition: .3s transform ease-in-out;
+}
+
+.btn2 {
+    padding: 15px;
+    margin: 25px;
+    margin-left: 20px;
+    text-align: center;
+    border: 2px solid black;
+    border-radius: 20px;
+    background-color: white;
+    font-weight: bold;
+    color: black;
+    font-size: 20px;
+    transition: .3s transform ease-in-out;
+}
+
+.btn1:hover,.btn2:hover {cursor: pointer;
+    transform:scale(1.1);}
+
+#page2 {
+    padding: 20px;
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+        url('https://www.pixelstalk.net/wp-content/uploads/2016/08/Food-best-hd-photos.jpg') no-repeat center;
+    background-size: cover;
+}
+
+.menu {
+    margin: 10px;
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    align-items: center;
+    flex-flow: row wrap;
+}
+
+.pg2hd {
+    margin: 50px;
+    font-size: 50px;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+}
+
+.mpg {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    min-width: 300px;
+    border-radius: 20px;
+    height: 55vh;
+    width: 200px;
+    padding: 40px;
+    color: white;
+    background-color: rgba(34, 33, 34, 0.6);
+}
+
+.cov1 {
+    padding: 20px;
+    border-radius: 20px;
+    background-color: rgb(8, 8, 8);
+}
+
+.cov1>h3 {
+    text-align: center;
+    font-size:
+}
+
+.cov1 ul li {
+    line-height: 1.6;
+}
+
+.menu>div:hover {
+    transform: scale(1.02);
+    /* Subtle lift on hover */
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 1);
+    /* Shadow on hover for depth */
+}
+
+.pg2hd {
+    font-family: 'Great Vibes', cursive;
+    font-size: 78px;
+    font-weight: 800;
+
+    color: white;
+
+    text-align: center;
+    line-height: 1.1;
+    letter-spacing: 2px;
+
+    margin: 70px 0 40px 0;
+
+    /* Ink-on-glass effect */
+    text-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.6),
+        0 8px 25px rgba(0, 0, 0, 0.8);
+}
