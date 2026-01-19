@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-200">
+    <div class="md:m-10 m-5 items-center rounded-lg bg-white gap-5 flex h-[90vh]">
+    <div class="hidden h-[100%] md:block">
+        <img src="/static/book.jpg"  class= 'h-[100%]'  width='800px'>
+    </div>
+    <div class="w-[100%]">
+        <h1 class="md:text-[55px] md:font-[gabriola] font-bold text-3xl text-center p-2 font-[forte] mt-10 text-[#7A2E2E]">BOOK A SLOT!</h1>
+    <form method="POST" action="/booking" class="border m-5 border-8 border-fray-400 h-[85%] w-[90%] border-w-8 px-2 py-10 text-center">
+        <div class='mb-4'>
+        <label for="name" class="text-lg font-bold">Name</label>
+        <input type="text" name="name" id="name" class="p-1 ml-2 md:w-[40%] border border-gray-300 border-2 p-1 rounded-lg">
+        </div>
+
+        <div class="mb-4" >
+        <label for="mob" class="text-lg font-bold">Mobile</label>
+        <input type="text" name="mob" id="mob" class="p-1 ml-2 md:w-[40%] border border-gray-300 border-2 p-1 rounded-lg">
+        </div>
+
+        <div class="mb-4">
+        <label for="doc" class="text-lg font-bold">Date</label>
+        <input type="date" name="doc" id="doc" class="p-1 ml-2 md:w-[40%] border border-gray-300 border-2 p-1 rounded-lg">
+        </div>
+
+        <div class="mb-4">
+        <label for="time" class="text-lg font-bold">Time</label>
+        <input type="time" name="time" id="time" class="p-1 ml-2 md:w-[40%] border border-gray-300 border-2 p-1 rounded-lg">
+        </div>
+
+        <div class="mb-4">
+        <label for="type" class="text-lg font-bold">Table Type</label>
+        <select name="type" id="type" class="p-1 ml-2 md:w-[40%] border border-gray-300 border-2 p-1 rounded-lg">
+            <option value="Function halls">Function halls</option>
+            <option value="Rooftop Party">Rooftop Party</option>
+            <option value="Guest Meetings">Guest Meetings</option>
+            <option value="Casual Dinner tables" selected>Casual Dinner tables</option>
+        </select></div>
+
+        <div class="mb-4 md:flex md:justify-center md:items-center gap-2">
+        <label for="req" class="text-lg font-bold">Any special request</label>
+        <textarea name="req" id="req" class="md:w-[70%] p-1 w-full border border-gray-300 border-2 p-1 rounded-lg"></textarea>
+        </div>
+
+        <button type="submit" class="mt-5 w-[90%] border bg-black text-white p-2 rounded-lg text-center">Book</button>
+
+    </form></div>
+    </div>
+</body>
+<script>
+    // function n(){
+    //     name=document.getElementById('name')
+    //     mob=document.getElementById('doc')
+    //     time=document.getElementById('time')
+    //     type=document.getElementById('type')
+    //     req=document.getElementById('req')
+    //     fetch('/booking',
+    //         {
+    //             method: "POST",
+    //             headers: { "Content-Type": "application/json" },
+    //             body: JSON.stringify({ 'name': name, 'mob': mob, 'time': time, 'type': type, 'req': req}
+    //             )
+    //         }).then()
+
+    //     }
+    
+</script>
+
+</html>

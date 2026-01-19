@@ -4,69 +4,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Dashboard</title>
+
     <style>
         * {
-            padding: 0;
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
             background: url('/static/tile.png') fixed;
+            /* NO BLUR */
+            font-family: Arial, Helvetica, sans-serif;
         }
 
+        /* ================= PAGE ================= */
         .page {
             margin: 30px;
             border-radius: 10px;
-            height: 100vh;
-            background-color: rgb(191, 182, 182);
+            background: #bfb6b6;
         }
 
-        .cont1 {
-            padding: 0px;
-            height: 90vh;
-        }
-
+        /* ================= LAYOUT ================= */
         .concon {
             display: flex;
-            justify-content: center;
         }
 
+        /* LEFT BAR */
         .leftbar {
-            padding: 0px;
             flex: 15%;
-            height: 240px;
-            border-radius: 10px 0px 0px 10px;
-            background-color: rgb(142, 137, 137);
+            min-width: 180px;
+            background: #8e8989;
+            border-radius: 10px 0 0 10px;
         }
 
+        .item {
+            padding: 12px;
+            font-size: 18px;
+            height: 50px;
+            background: linear-gradient(rgb(211, 203, 166), rgb(138, 59, 59));
+            transition: 0.15s;
+        }
+
+        .item:hover {
+            transform: scaleX(1.08);
+            cursor: pointer;
+        }
+
+        /* RIGHT BAR */
         .rightbar {
-            padding: 0px;
-            flex: 90%;
+            flex: 85%;
         }
 
+        /* ================= TOP SECTION ================= */
         .up {
-            padding: 10px;
-            border: 1px solid black;
-            background: url('/static/cc3.png') no-repeat;
-            background-size: cover;
+            display: flex;
+            align-items: center;
+            gap: 120px;
+            padding: 20px;
+            background: url('/static/cc3.png') no-repeat center/cover;
             color: white;
             height: 220px;
-            display: flex;
-            gap: 120px;
         }
 
         .atlef {
-            margin: 10px 0px 0px 500px;
-            font-size: 40px;
+            margin-left: 500px;
+            /* YOUR ORIGINAL LOOK */
             font-family: gabriola;
-        }
-        .btn:hover{
-            cursor: pointer;
-            box-shadow:0px 0px 20px;
-            transform: scale(1.05);
+            font-size: 40px;
         }
 
+        /* BUTTON */
         .btn {
             height: 80px;
             width: 200px;
@@ -74,192 +83,274 @@
             background: black;
             color: white;
             border-radius: 20px;
+            border: none;
             box-shadow: 10px 0px 10px;
-            margin: 30px 0px;
-            transition: all 0.1s ease-in-out;
+            transition: 0.15s;
         }
 
-        .item {
-            padding: 10px;
-            font-size: 20px;
-            height: 30px;
-            background: linear-gradient(rgb(211, 203, 166), rgb(138, 59, 59));
-            transition: all 0.1s ease-in;
+        .btn:hover {
+            box-shadow: 0 0 20px;
+            transform: scale(1.05);
+            cursor: pointer;
         }
 
-        .item:hover {
-            height: 40px;
-            transform: scaleX(1.05);
-        }
-
-        .img {
-            height: inherit;
-        }
-
+        /* ================= MAIN ================= */
         .main {
-            margin: 0px 20px;
-            width: inherit;
             padding: 30px;
         }
 
+        /* GRID */
         .options {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
+            align-items: stretch;
+            /* FIX equal height */
         }
 
+        /* ================= CARD ================= */
         .book {
-            border-radius: 20px;
             display: flex;
-            box-shadow:10px 10px 10px;
             height: 180px;
-            border: 1 px solid black;
+            /* FORCE SAME HEIGHT */
             background: linear-gradient(grey, white);
-            transition: 0.1s all ease-in-out;
-        }
-
-        .image {
-            flex: 30%;
-            border-radius: 20px 0px 0px 20px;
-        }
-
-        .content {
-            font-family: sans-serif;
-            flex: 70%;
-            padding: 20px;
-        }
-
-        .price {
-            font-family: forte;
-
-        }
-
-        .content h2 {
-            font-family: gabriola;
-            text-shadow: 10px 5px 10px;
-        }
-
-        .content p {
-            margin: 5px;
-            color: black;
-            font-weight: bold;
+            border-radius: 20px;
+            box-shadow: 10px 10px 10px;
+            transition: 0.15s;
         }
 
         .book:hover {
             transform: scale(1.02);
-            box-shadow:0px 0px 0px;
+            box-shadow: 0 0 0;
         }
-        .mn{
-            display:flex;
-            gap:100px;
+
+        /* IMAGE */
+        .image {
+            width: 30%;
+            object-fit: cover;
         }
+
+        /* CONTENT */
+        .content {
+            width: 70%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content h2 {
+            font-family: gabriola;
+        }
+
+        .content p {
+            font-weight: bold;
+        }
+
+        /* PRICE + BTN */
+        .mn {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        .price {
+            font-family: forte;
+        }
+
         .bkbtn {
-            float: right;
-            padding: 10px;
-            background:transparent;
-            font-weight: bolder;
-            border: 0;
-            color: black;
-            font-size: 18px;
-            margin-left: auto;
-            margin-top:auto;
-            transition:all 0.1s ease-in-out;
+            background: transparent;
+            border: none;
+            font-size: 20px;
+            transition: 0.15s;
         }
-        .bkbtn:hover{
-            cursor:pointer;
+
+        .bkbtn:hover {
             transform: scale(1.1);
+            cursor: pointer;
+        }
+
+        /* ================= TABLET ================= */
+        @media(max-width:1024px) {
+
+            .concon {
+                flex-direction: column;
+            }
+
+            .leftbar {
+                display: flex;
+                justify-content: space-around;
+                border-radius: 10px 10px 0 0;
+            }
+
+            .atlef {
+                margin-left: 0;
+                text-align: center;
+                font-size: 30px;
+            }
+
+            .up {
+                flex-direction: column;
+                gap: 20px;
+                height: auto;
+            }
+
+            .options {
+                grid-template-columns: 1fr;
+            }
+
+            .book {
+                height: 260px;
+                flex-direction: column;
+            }
+
+            .image {
+                width: 100%;
+                height: 120px;
+            }
+
+            .mn {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+        }
+
+        /* ================= MOBILE ================= */
+        @media(max-width:768px) {
+
+            .page {
+                margin: 10px;
+            }
+
+            .item {
+                font-size: 15px;
+                text-align: center;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* ===== MOBILE CONTENT FIX (NO DESIGN CHANGE) ===== */
+        @media (max-width: 768px) {
+
+            .book {
+                height: auto;
+                /* let card grow naturally */
+                min-height: 260px;
+                /* keeps visual balance */
+            }
+
+            .content {
+                overflow: hidden;
+                /* prevents spill */
+                word-wrap: break-word;
+            }
+
+            .content p {
+                font-size: 14px;
+                line-height: 1.4;
+            }
+
+            .mn {
+                margin-top: 10px;
+            }
         }
     </style>
 </head>
 
 <body>
+
     <div class="page">
-        <div class="cont1">
-            <div class="concon">
-                <div class="leftbar">
-                    <div class="profile item">Profile</div>
-                    <div class="his item">History</div>
-                    <div class="feed item">Feedback</div>
-                    <div class="logout item">Logout</div>
-                </div>
-                <div class="rightbar">
-                    <div class="up">
-                        <div class="atlef">
-                            <h1>Hi {{name}} !</h1>
-                            <p>Atithi devo bhavha!</p>
-                        </div>
-                        <div class="atright">
-                            <button class="btn">Book a table</button>
-                        </div>
+
+        <div class="concon">
+
+            <div class="leftbar">
+                <div class="item" onclick="window.location.href='/profile'">Profile</div>
+                <div class="item" onclick="window.location.href='/history'">History</div>
+                <div class="item" onclick="window.location.href='/feedback'">Feedback</div>
+                <div class="item" onclick="window.location.href='/logout'">Logout</div>
+            </div>
+
+            <div class="rightbar">
+                <div class="up">
+                    <div class="atlef">
+                        <h1>Hi {{n}}!</h1>
+                        <p>Atithi devo bhavha!</p>
                     </div>
+                    <button class="btn" onclick="window.location.href='/bookpage'">Book a table</button>
                 </div>
             </div>
 
-            <div class="main">
-                <div class="options">
-                    <div class="book o1">
-                        <img src="/static/cas.jpg" class="image">
-                        <div class="content">
-                            <h2>Casual Dinner tables</h2>
-                            <p>
-                                Enjoy a relaxed and comfortable dining experience with warm lighting and thoughtfully
-                                arranged tables.
-                                Ideal for family dinners, date nights, and small celebrations.
-                            </p>
-                            <div class="mn">
-                                <div class="price">₹200 / table</div>
-                                <button class="bkbtn">&#8599;</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="book o2">
-                        <img src="/static/met.jpg" class="image">
-                        <div class="content">
-                            <h2>Guest Meetings</h2>
-                            <p>
-                                A quiet and professional environment designed for focused discussions, interviews, and
-                                meetings.
-                                Comfortable seating with minimal distractions.
-                            </p>
-                            <div class="mn">
-                                <div class="price">₹500 / table</div>
-                                <button class="bkbtn">&nearr;</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="book o3">
-                        <img src="/static/rof.gif" class="image">
-                        <div class="content">
-                            <h2>Rooftop Party</h2>
-                            <p>
-                                A quiet and professional environment designed for focused discussions, interviews, and
-                                meetings.
-                                Comfortable seating with minimal distractions.
-                            </p>
-                            <div class="mn">
-                                <div class="price">₹1000 / table</div>
-                                <button class="bkbtn">&nearr;</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="book o4">
-                        <img src="/static/f.jpg" class="image">
-                        <div class="content">
-                            <h2>Function halls</h2>
-                            <p>
-                                A stylish open-air rooftop with ambient lighting and a vibrant nightlife vibe.
-                                Ideal for private parties, birthdays, and evening celebrations.
-                            </p>
-                            <div class="mn">
-                                <div class="price">₹2500 / table</div>
-                                <button class="bkbtn">&nearr;</button>
-                            </div>
+        </div>
+
+        <div class="main">
+            <div class="options">
+
+                <div class="book o1">
+                    <img src="/static/cas.jpg" class="image">
+                    <div class="content">
+                        <h2>Casual Dinner tables</h2>
+                        <p>
+                            Enjoy a relaxed and comfortable dining experience with warm lighting and thoughtfully
+                            arranged tables. Ideal for family dinners and small celebrations.
+                        </p>
+                        <div class="mn">
+                            <div class="price">₹200 / table</div>
+                            <button class="bkbtn">&#8599;</button>
                         </div>
                     </div>
                 </div>
+
+                <div class="book o2">
+                    <img src="/static/met.jpg" class="image">
+                    <div class="content">
+                        <h2>Guest Meetings</h2>
+                        <p>
+                            A quiet and professional environment designed for focused discussions and meetings.
+                        </p>
+                        <div class="mn">
+                            <div class="price">₹500 / table</div>
+                            <button class="bkbtn">&#8599;</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="book o3">
+                    <img src="/static/rof.gif" class="image">
+                    <div class="content">
+                        <h2>Rooftop Party</h2>
+                        <p>
+                            Open-air rooftop with ambient lighting, perfect for private parties and celebrations.
+                        </p>
+                        <div class="mn">
+                            <div class="price">₹1000 / table</div>
+                            <button class="bkbtn">&#8599;</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="book o4">
+                    <img src="/static/f.jpg" class="image">
+                    <div class="content">
+                        <h2>Function halls</h2>
+                        <p>
+                            Spacious halls suitable for weddings, events, and large gatherings.
+                        </p>
+                        <div class="mn">
+                            <div class="price">₹2500 / table</div>
+                            <button class="bkbtn">&#8599;</button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
+
     </div>
+
 </body>
 
 </html>

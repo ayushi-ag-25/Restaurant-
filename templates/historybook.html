@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+
+        body{
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            background-color: rgb(213, 211, 211);
+        }
+        .main{
+            min-height:85vh;
+            padding:20px;
+            margin: 2% 5%;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: white;
+            gap:20px;
+        }
+        .box{
+            background-color: rgb(198, 215, 196);
+            border-radius: 20px;;
+            padding:20px;
+            display: flex;
+            flex-direction: column;
+            width:80%;
+        }
+        .upper{
+            display: flex;
+        }
+        .dt{
+            display: flex;
+            flex-direction: column;
+            margin-left:auto}
+
+        .lower{
+            display: flex;
+            flex-direction: column;
+            margin-left: auto;
+        }
+
+        .type{
+            color:green;
+            font-size: larger;
+            font-weight: bold;
+        }
+        h1{
+            font-family: gabriola;
+            text-align: center;
+            font-size:xxx-large;
+        }
+        .norecords{
+            padding:20px;
+            display:flex;
+            justify-content: center;
+            align-items: center;
+            border:1px solid rgb(155, 205, 205);
+            border-radius: 10px;
+            height:60px;
+            width:200px;
+            background-color: rgb(161, 216, 216);
+        }
+
+        .reqbody{
+            margin:20px 0px;
+        }
+
+
+
+    </style>
+</head>
+
+<body>
+    <div class="main">
+        <h1>Records</h1>
+        {% if not d %}
+        <div class="norecords">
+            No records found!
+        </div>
+        {%else%}
+        {% for i in d %}
+        <div class="box">
+            <div class="upper">
+                <div class="type">{{i[5]}}</div>
+                <div class="dt">
+                    <div class="date">{{i[3]}}</div>
+                    <div class="time">{{i[4]}}</div>
+                </div>
+            </div>
+            <div class="reqbody">{{i[6]}}</div>
+            <div class="lower">
+                <div class="mobile">{{i[2]}}</div>
+                <div class="name">{{i[0]}}</div>
+            </div>
+        </div>
+        {% endfor %}
+        {%endif%}
+    </div>
+</body>
+
+</html>

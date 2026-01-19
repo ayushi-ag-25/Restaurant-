@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family: sans-serif;
+        }
+
+        body{
+            background: linear-gradient(135deg, rgb(190,230,230), rgb(230,240,240));
+            min-height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+
+        .card{
+            background:white;
+            width:100%;
+            max-width:450px;
+            border-radius:20px;
+            padding:30px;
+            box-shadow:0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        h1{
+            font-family: gabriola;
+            font-size:42px;
+            text-align:center;
+            margin-bottom:20px;
+            color:#333;
+        }
+
+        .field{
+            margin-bottom:15px;
+        }
+
+        label{
+            display:block;
+            margin-bottom:6px;
+            font-weight:bold;
+            font-size:14px;
+        }
+
+        input{
+            width:100%;
+            padding:10px;
+            border-radius:10px;
+            border:1px solid #ccc;
+            font-size:14px;
+        }
+
+        input:focus{
+            outline:none;
+            border-color:rgb(90,180,180);
+        }
+
+        .gender{
+            display:flex;
+            gap:15px;
+            margin-top:5px;
+        }
+
+        .gender label{
+            font-weight:normal;
+            font-size:14px;
+        }
+
+        .actions{
+            display:flex;
+            justify-content:space-between;
+            margin-top:20px;
+        }
+
+        button{
+            border:none;
+            border-radius:20px;
+            padding:10px 20px;
+            cursor:pointer;
+            font-size:18px;
+            font-family: gabriola;
+        }
+
+        .save{
+            background: linear-gradient(to right, rgb(80,200,200), rgb(120,150,150));
+            color:white;
+        }
+
+        .cancel{
+            background:#ddd;
+        }
+
+        .msg{
+            margin-top:10px;
+            font-size:12px;
+            color:red;
+            text-align:center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <h1>Edit Profile</h1>
+
+        <form method="POST" action="/changeprofile">
+
+            <div class="field">
+                <label>Name</label>
+                <input type="text" name="name" value="{{ d[4] }}" required>
+            </div>
+
+            <div class="field">
+                <label>Email</label>
+                <input type="email" name="mail" value="{{ d[5] }}" required>
+            </div>
+
+            <div class="field">
+                <label>Mobile</label>
+                <input type="text" name="mobile" value="{{ d[2] }}" readonly>
+            </div>
+
+            <div class="field">
+                <label>Gender</label>
+                <div class="gender">
+                    <label>
+                        <input type="radio" name="gender" value="Female" {% if d[1]=='Female' %}checked{% endif %}>
+                        Female
+                    </label>
+                    <label>
+                        <input type="radio" name="gender" value="Male" {% if d[1]=='Male' %}checked{% endif %}>
+                        Male
+                    </label>
+                    <label>
+                        <input type="radio" name="gender" value="Other" {% if d[1]=='Other' %}checked{% endif %}>
+                        Other
+                    </label>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button type="button" class="cancel" onclick="window.location.href='/profile'">
+                    Cancel
+                </button>
+                <button type="submit" class="save">
+                    Save Changes
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+</body>
+</html>

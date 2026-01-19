@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback</title>
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+        }
+
+        body{
+            background-color: rgb(213, 211, 211);
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            min-height:100vh;
+        }
+
+        .container{
+            background:white;
+            width:100%;
+            max-width:500px;
+            padding:30px;
+            border-radius:20px;
+            box-shadow:0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        h1{
+            text-align:center;
+            margin-bottom:20px;
+            font-family: gabriola;
+            font-size:48px;
+        }
+
+        .field{
+            margin-bottom:15px;
+            display:flex;
+            flex-direction:column;
+        }
+
+        label{
+            font-weight:bold;
+            margin-bottom:6px;
+        }
+
+        input, textarea, select{
+            padding:10px;
+            border-radius:8px;
+            border:1px solid #ccc;
+            font-size:14px;
+        }
+
+        textarea{
+            resize:none;
+            min-height:100px;
+        }
+
+        .rating{
+            display:flex;
+            justify-content:space-between;
+            margin-top:8px;
+        }
+
+        .rating input{
+            accent-color: green;
+        }
+
+        button{
+            margin-top:20px;
+            width:100%;
+            padding:12px;
+            border:none;
+            border-radius:10px;
+            background-color: green;
+            color:white;
+            font-size:16px;
+            font-weight:bold;
+            cursor:pointer;
+        }
+
+        button:hover{
+            background-color: darkgreen;
+        }
+
+        @media(max-width:500px){
+            .container{
+                margin:10px;
+                padding:20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Feedback</h1>
+
+        <form method="post" action="/feedsave">
+            
+            <div class="field">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" placeholder="Enter your name" required>
+            </div>
+
+            <div class="field">
+                <label for="no">Mobile</label>
+                <input type="number" id="no" name="mob" placeholder="Enter your mobile no.">
+            </div>
+
+            <div class="field">
+                <label>Rate your experience</label>
+                <div class="rating">
+                    <label><input type="radio" name="rating" value="1" required> 1</label>
+                    <label><input type="radio" name="rating" value="2"> 2</label>
+                    <label><input type="radio" name="rating" value="3"> 3</label>
+                    <label><input type="radio" name="rating" value="4"> 4</label>
+                    <label><input type="radio" name="rating" value="5"> 5</label>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="message">Your Feedback</label>
+                <textarea id="message" name="message" placeholder="Write your feedback here..." required></textarea>
+            </div>
+
+            <button type="submit">Submit Feedback</button>
+        </form>
+    </div>
+</body>
+</html>

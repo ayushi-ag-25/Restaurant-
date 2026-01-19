@@ -91,7 +91,7 @@
             animation:oj 3s linear forwards;
             animation-delay: 2s;
         }
-        @keyframe oj{
+        @keyframes oj{
             to{opacity:0}
         }
     </style>
@@ -102,48 +102,39 @@
         <h1>Be a part of best bliss family🪄</h1>
         <div class="boxes">
             <div class="log box">
-                <form method="POST" action="/check">
+                <form method="POST" onsubmit="ch(event)">
                     <label for="username1">Username:</label>
-                    <input type="text" name='username1' id="username1" placeholder="Mobile no."><br>
+                    <input type="text" name='mob' id="username1" placeholder="Mobile no."><br>
                     <label for="pass1">Password:</label>
-                    <input type="password" name='pass1' id="pass1" placeholder="password"><br>
+                    <input type="password" name='pass' id="pass1" placeholder="password"><br>
                     <p id="message">{{mes}}</p>
                     <input type="submit" class="login btn" value="Login">
                 </form>
-                <p class="goto">Didn't have an account? <button onclick='sin()' class="change">Register</button></p>
-            </div>
-            <div class="sign box">
-                <form method="POST" action="/add">
-                    <label for="name">Name:</label>
-                    <input type="text" name='nam' id="name" placeholder="what would you like to be called?"><br>
-                    <label for="username2">Mobile:</label>
-                    <input type="text" id="username2" name='username2' placeholder="Mobile no."><br>
-                    <label for="pass2">Password:</label>
-                    <input type="pass" id="pass2"  name='pass2' placeholder="set a password"><br>
-                    
-                    <input type="submit" class="login btn" value="Register">
-                </form>
-                <p class="goto">Already have an account? <button onclick='logi()' class="change">Login</button></p>
+                <p class="goto">Didn't have an account? <button onclick='window.location.href="/register"' class="change">Register</button></p>
             </div>
         </div>
     </div>
 </body>
 <script>
     mess = document.getElementById('message');
-    if (mess.textContent) {
-       setTimeout(
-        ()=>{mess.style.display='none'},2000
-       )
-    }
 
-    function sin() {
-        console.log('hgvbnm');
-        document.querySelector('.log').style.display = 'none';
-        document.querySelector('.sign').style.display = 'block'
-    }
-    function logi() {
-        document.querySelector('.sign').style.display = 'none';
-        document.querySelector('.log').style.display = 'block';
+    function ch(event){
+        event.preventDefault();
+        u=document.getElementById('username1').value
+        p=document.getElementById('pass1').value
+        fetch('/check',{method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({'mob':u,'pass':p})
+            }).then(x=>x.json()).then((d)=>{
+                if(!d['mobexist']){
+                    mess.textContent='Mobile no. is not registered';
+                }else if(!d['passmatch']){
+                    mess.textContent='Inavlid pass';
+                }else{
+                    window.location.href='/dashboard';
+                }
+                return false
+            })
     }
 </script>
 

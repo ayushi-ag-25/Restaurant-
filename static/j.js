@@ -27,3 +27,21 @@ window.addEventListener("wheel", (e) => {
     }, 700); // adjust time according to smooth scroll speed
 });
 console.log('jiiiiii')
+
+function scrr() {
+    ;
+    currentIndex = 1;
+    window.scrollTo({
+        top: sections[currentIndex].offsetTop,
+        behavior: "smooth"
+    });
+}
+
+function scr2() {
+    ;
+    currentIndex = 2;
+    window.scrollTo({
+        top: sections[currentIndex].offsetTop,
+        behavior: "smooth"
+    });
+}

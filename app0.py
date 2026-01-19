@@ -1,6 +1,31 @@
 from flask import *
+import os
+from datetime import timedelta
+import mysql.connector as ms
+
+def my_db():
+    mycon=ms.connect(user='root',host='localhost',passwd='123',database='hotel')
+    return mycon
+
+
+mycon=my_db()
+cursor=mycon.cursor()
+cursor.execute('CREATE TABLE IF NOT EXISTS LOGIN(ID INT PRIMARY KEY AUTO_INCREMENT,GENDER VARCHAR(10),MOBILE BIGINT UNIQUE,PASSWORD VARCHAR(20),NAME VARCHAR(20),MAIL VARCHAR(50))AUTO_INCREMENT = 1000')
+cursor.execute('CREATE TABLE IF NOT EXISTS BOOKINGS(ID INT,NAME VARCHAR(20),BID INT PRIMARY KEY AUTO_INCREMENT,MOBILE BIGINT,DOC DATE,TOC TIME,TABLETYPE VARCHAR(30),REQUEST VARCHAR(500))AUTO_INCREMENT = 1000')
+cursor.execute('CREATE TABLE IF NOT EXISTS FEEDBACKS(FID INT PRIMARY KEY AUTO_INCREMENT, ID INT,NAME VARCHAR(20),MOBILE BIGINT,RATE INT,FEEDBACK VARCHAR(500))AUTO_INCREMENT = 1000')
 
 app=Flask(__name__)
+app.secret_key='123'
+app.permanent_session_lifetime=timedelta(days=1)
+
+def checklogin(f):
+    def wrapper(*args,**kwargs):
+        if 'userid' in session:
+            return f(*args,**kwargs)
+        return redirect(url_for('bookingload'))
+    wrapper.__name__=f.__name__
+    return wrapper
+
 
 @app.route('/')
 def homepage():
@@ -8,101 +33,165 @@ def homepage():
 
 @app.route('/book')
 def bookingload():
-    return render_template('hotelloginpage.html',mes='')
+    return render_template('hotelloginpage.html')
 
-details={}
+@app.route('/register',methods=['GET', 'POST'])
+def reg():
+    return render_template('register.html')
 
 
-@app.route('/check',methods=['POST','GET'])
+@app.route('/dashboard')
+@checklogin
+def dash():
+    return render_template('dashboard.html',n=session['name'])
+
+
+@app.route('/check',methods=['POST'])
 def check():
-    if request.method=="POST":
-        user=request.form['username1']
-        pasw=request.form['pass1']
-        if user in details and details[user][0]==pasw:
-            return render_template('dashboard.html',name=details[user][1])
-        else:
-            return render_template('hotelloginpage.html',mes='Invalid username and password')
+    data=request.get_json()
+    mycon=my_db()
+    cursor=mycon.cursor()
+    cursor.execute('SELECT * FROM LOGIN WHERE MOBILE=%s',(data['mob'],))
+    entry=cursor.fetchone()
+    response={'mobexist':0,'passmatch':0}
+    if entry:
+        response['mobexist']=1
+        if int(entry[3])==int(data['pass']):
+            session['userid']=entry[0]
+            session['name']=entry[4]
+            response['passmatch']=1
+    return jsonify(response)
 
 
-@app.route('/add',methods=['POST','GET'])
+@app.route('/add',methods=['POST'])
 def adding():
-    if request.method=="POST":
-        user=request.form['username2']
-        pasw=request.form['pass2']
-        n=request.form['nam']
-        details[user]=[pasw,n]
-        return render_template('hotelloginpage.html',mes='')
+        data=request.get_json()
+        mycon=my_db()
+        cursor=mycon.cursor()
+        cursor.execute('SELECT * FROM LOGIN WHERE MOBILE=%s',(data['mob'],))
+        entry=cursor.fetchone()
+        if entry:
+            return jsonify({'success':False})
+        cursor.execute('INSERT INTO LOGIN(GENDER,MOBILE,PASSWORD,NAME,MAIL) VALUES(%s,%s,%s,%s,%s)',(data['gender'],data['mob'],data['pass'],data['name'],data['mail'],))
+        mycon.commit()
+        return jsonify({'success':True})
+
+
+@app.route('/bookpage')
+@checklogin
+def bookpage():
+    return render_template('booking.html')
+
+
+@app.route('/booking',methods=['POST'])
+@checklogin
+def booking():
+    data=request.form
+    mycon=my_db()
+    cursor=mycon.cursor()
+    cursor.execute(
+    'INSERT INTO BOOKINGS(ID,NAME,MOBILE,DOC,TOC ,TABLETYPE,REQUEST) VALUES(%s,%s,%s,%s,%s,%s,%s)'
+    ,(session['userid'],data['name'],data['mob'],data['doc'],data['time'],data['type'],data['req'])
+    )
+    mycon.commit()
+    return redirect(url_for('dash'))
+
+
+@app.route('/history')
+@checklogin
+def history():
+    mycon=my_db()
+    cursor=mycon.cursor()
+    cursor.execute('SELECT * FROM BOOKINGS WHERE ID = %s',(session['userid'],))
+    data=cursor.fetchall()
+    d=[]    
+    for i in data:
+        d.append(list(i[1:]))
+    print(d)
+    return render_template('historybook.html',d=d)
+
+
+@app.route('/feedback')
+@checklogin
+def fedd():
+    return render_template('feedback.html')
+
+
+@app.route('/feedsave',methods=['POST'])
+@checklogin
+def fed():
+    mycon=my_db()
+    cursor=mycon.cursor()
+    data=request.form
+    cursor.execute('INSERT INTO FEEDBACKS(ID,NAME,MOBILE,RATE,FEEDBACK) VALUES(%s,%s,%s,%s,%s)',(session['userid'],data['name'],data['mob'],data['rating'],data['message']))
+    mycon.commit()
+    return redirect(url_for('dash'))
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('bookingload'))
+
+@app.after_request
+def add_no_cache_headers(response):
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, private'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
+@app.route('/profile')
+@checklogin
+def profile():
+    mycon=my_db()
+    cursor=mycon.cursor()
+    cursor.execute('SELECT * FROM LOGIN WHERE ID=%s',(session['userid'],))
+    t=list(cursor.fetchone())
+    cursor.execute('SELECT * FROM FEEDBACKS WHERE ID=%s',(session['userid'],))
+    f=len(cursor.fetchall())
+    cursor.execute('SELECT * FROM BOOKINGS WHERE ID=%s',(session['userid'],))
+    b=len(cursor.fetchall())
+    t.extend([f,b])
+    print(t)
+    return render_template('profile.html',t=t)
+
+@app.route('/changeprofile',methods=['POST'])
+@checklogin
+def edit():
+    mycon=my_db()
+    cursor=mycon.cursor()
+    data=request.form
+    prompt='UPDATE LOGIN SET '
+    c=0
+    k=[]
+    for i in data:
+        if c!=0:
+            prompt+=','
+        prompt+=f'{i.upper()}=%s'
+        if i=='mobile':
+            k.append(int(data[i]))
+        else:
+            k.append(data[i])
+        c+=1
+    print(prompt)
+    cursor.execute(prompt+' WHERE ID =%s',tuple(k)+(session['userid'],))
+    mycon.commit()
+    session['name']=data['name']
+    return redirect(url_for('profile'))
+
+@app.route('/editprofile')
+@checklogin
+def cedit():
+    mycon=my_db()
+    cursor=mycon.cursor()
+    cursor.execute('SELECT * FROM LOGIN WHERE ID=%s',(session['userid'],))
+    data=cursor.fetchone()
+    return render_template('editprofile.html',d=data)
+
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Use PORT from environment, fallback to 5000 locally
-    app.run(host="0.0.0.0", port=port)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# from flask import *
-# from datetime import timedelta
-# app=Flask(__name__)
-
-# app.secret_key = "secret123"
-# app.permanent_session_lifetime = timedelta(minutes=1)
-
-# @app.route('/login')
-# def login():
-#     session.permanent = True
-#     session['user_id'] = 1
-#     return "Logged in for 1 minutes"
-
-# @app.errorhandler(406)
-# def forbidden(e):
-#     return "Username cannot start with number", 403
-
-
-# @app.route('/l')
-# def g():
-#     abort(406,'bdbkwdw')
-
-# @app.route('/')
-# def h():
-#     return render_template('sigup.html')
-# @app.route('/set',methods=['POST','GET'])
-# def k():
-#     if request.method=='POST':
-#         a=request.form
-#         an=make_response(render_template('logi.html'))
-#         an.set_cookie('username',a['user'])
-#         an.set_cookie('password',a['pass'])
-#         return an
-# @app.route('/log',methods=["POST","GET"])
-# def n():
-#     if request.method=='POST':
-#         a=request.form
-#         if a['user']==request.cookies.get('username') and a['pass']==request.cookies.get('password'):
-#             return redirect(url_for(login))
-#         return "Failure"
-    
-# app.run(debug=True)
-
-
-# ############################################3
+    app.run(host="0.0.0.0", port=port,debug=True)
 
 
 
