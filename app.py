@@ -248,6 +248,6 @@ def profile():
     return render_template('profile.html', t=t)
 
 # ---------------- START ----------------
-init_db()  # run this for Railway/Gunicorn
+init_db()  # run this for Railway/Gunicorn B 
 port = int(os.environ.get("PORT", 5000))
 app.run(host="0.0.0.0", port=port)
