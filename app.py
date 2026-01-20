@@ -88,7 +88,7 @@ def dash():
     return render_template('dashboard.html', n=session['name'])
 
 # ---------------- LOGIN ----------------
-@app.route('/check', methods=['POST'])
+@app.route('/check', methods=['POST','GET'])
 def check():
     data = request.get_json()
     con = my_db()
@@ -110,7 +110,7 @@ def check():
     return jsonify(res)
 
 # ---------------- REGISTER ----------------
-@app.route('/add', methods=['POST'])
+@app.route('/add', methods=['POST','GET'])
 def adding():
     try:  # CHANGED
         data = request.get_json()
@@ -187,7 +187,7 @@ def history():
 def fedd():
     return render_template('feedback.html')
 
-@app.route('/feedsave', methods=['POST'])
+@app.route('/feedsave', methods=['POST','GET'])
 @checklogin
 def fed():
     d = request.form
