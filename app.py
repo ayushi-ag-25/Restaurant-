@@ -90,24 +90,31 @@ def dash():
 # ---------------- LOGIN ----------------
 @app.route('/check', methods=['POST','GET'])
 def check():
-    data = request.get_json()
-    con = my_db()
-    cur = con.cursor()
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'mobexist': False, 'passmatch': False}), 400
 
-    cur.execute("SELECT * FROM LOGIN WHERE MOBILE=%s", (data['mob'],))
-    entry = cur.fetchone()
-    con.close()
+        con = my_db()
+        cur = con.cursor(dictionary=True)  # safer: access by column names
+        cur.execute("SELECT * FROM LOGIN WHERE MOBILE=%s", (data['mob'],))
+        entry = cur.fetchone()
+        con.close()
 
-    res = {'mobexist': 0, 'passmatch': 0}
+        res = {'mobexist': False, 'passmatch': False}
 
-    if entry:
-        res['mobexist'] = 1
-        if entry[3] == data['pass']:   # CHANGED (string compare)
-            session['userid'] = entry[0]
-            session['name'] = entry[4]
-            res['passmatch'] = 1
+        if entry:
+            res['mobexist'] = True
+            if entry['PASSWORD'] == data['pass']:
+                session['userid'] = entry['ID']
+                session['name'] = entry['NAME']
+                res['passmatch'] = True
 
-    return jsonify(res)
+        return jsonify(res)
+
+    except Exception as e:
+        print("ERROR in /check:", e)  # this will show the real error in Railway logs
+        return jsonify({'mobexist': False, 'passmatch': False, 'error': str(e)}), 500
 
 # ---------------- REGISTER ----------------
 @app.route('/add', methods=['POST','GET'])
