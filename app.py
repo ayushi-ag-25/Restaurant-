@@ -133,8 +133,8 @@ def adding():
             VALUES(%s,%s,%s,%s,%s)
         """, (
             data['gender'],
-            data['mob'],
-            data['pass'],
+           str(data['mob']),
+           str(data['pass']),
             data['name'],
             data['mail']
         ))
@@ -144,7 +144,7 @@ def adding():
         return jsonify({'success': True})
 
     except Exception as e:   # CHANGED
-        print("ERROR:", e)
+        return e
         return jsonify({'success': False}), 500
 
 # ---------------- BOOKING ----------------
