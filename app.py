@@ -4,7 +4,7 @@ from datetime import timedelta
 import mysql.connector as ms
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "123")  # CHANGED
+app.secret_key = os.environ.get("SECRET_KEY", "123")
 app.permanent_session_lifetime = timedelta(days=1)
 
 # ---------------- DATABASE ----------------
@@ -27,7 +27,7 @@ def init_db():
         ID INT PRIMARY KEY AUTO_INCREMENT,
         GENDER VARCHAR(10),
         MOBILE BIGINT UNIQUE,
-        PASSWORD VARCHAR(50),   -- CHANGED (safer)
+        PASSWORD VARCHAR(50),
         NAME VARCHAR(20),
         MAIL VARCHAR(50)
     )
@@ -88,7 +88,7 @@ def dash():
     return render_template('dashboard.html', n=session['name'])
 
 # ---------------- LOGIN ----------------
-@app.route('/check', methods=['POST','GET'])
+@app.route('/check', methods=['POST', 'GET'])
 def check():
     try:
         data = request.get_json()
@@ -96,7 +96,7 @@ def check():
             return jsonify({'mobexist': False, 'passmatch': False}), 400
 
         con = my_db()
-        cur = con.cursor(dictionary=True)  # safer: access by column names
+        cur = con.cursor(dictionary=True)
         cur.execute("SELECT * FROM LOGIN WHERE MOBILE=%s", (data['mob'],))
         entry = cur.fetchone()
         con.close()
@@ -113,28 +113,33 @@ def check():
         return jsonify(res)
 
     except Exception as e:
-        print("ERROR in /check:", e)  # this will show the real error in Railway logs
+        print("ERROR in /check:", e)
         return jsonify({'mobexist': False, 'passmatch': False, 'error': str(e)}), 500
 
 # ---------------- REGISTER ----------------
-@app.route('/add', methods=['POST','GET'])
+@app.route('/add', methods=['POST', 'GET'])
 def adding():
-    try:  # CHANGED
+    try:
         data = request.get_json()
+        if not data:
+            return jsonify({'success': False}), 400
+
         con = my_db()
         cur = con.cursor()
 
-        cur.execute("SELECT ID FROM LOGIN WHERE MOBILE=%s", (data['mob'],))
+        # check if mobile already exists
+        cur.execute("SELECT ID FROM LOGIN WHERE MOBILE=%s", (str(data['mob']),))
         if cur.fetchone():
             return jsonify({'success': False})
 
+        # insert new user
         cur.execute("""
             INSERT INTO LOGIN(GENDER,MOBILE,PASSWORD,NAME,MAIL)
             VALUES(%s,%s,%s,%s,%s)
         """, (
             data['gender'],
-           str(data['mob']),
-           str( data['pass'],
+            str(data['mob']),
+            str(data['pass']),
             data['name'],
             data['mail']
         ))
@@ -143,9 +148,9 @@ def adding():
         con.close()
         return jsonify({'success': True})
 
-    except Exception as e:   # CHANGED
-        print("ERROR:", e)
-        return jsonify({'success': False}), 500
+    except Exception as e:
+        print("ERROR in /add:", e)
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 # ---------------- BOOKING ----------------
 @app.route('/bookpage')
@@ -244,6 +249,6 @@ def profile():
 
 # ---------------- START ----------------
 if __name__ == "__main__":
-    init_db()   # runs once on deploy
+    init_db()
     port = int(os.environ.get("PORT", 8080))
     app.run(host="0.0.0.0", port=port)
