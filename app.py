@@ -248,7 +248,6 @@ def profile():
     return render_template('profile.html', t=t)
 
 # ---------------- START ----------------
-if __name__ == "__main__":
-    init_db()
-    port = int(os.environ.get("PORT", 8080))
-    app.run(host="0.0.0.0", port=port)
+init_db()  # run this for Railway/Gunicorn
+port = int(os.environ.get("PORT", 8080))
+app.run(host="0.0.0.0", port=port)
