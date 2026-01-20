@@ -3,30 +3,74 @@ import os
 from datetime import timedelta
 import mysql.connector as ms
 
+# ---------------- DATABASE CONNECTION ----------------
 def my_db():
-    mycon=ms.connect(user='root',host='localhost',passwd='123',database='hotel')
-    return mycon
+    return ms.connect(
+        host=os.environ.get("MYSQLHOST"),
+        user=os.environ.get("MYSQLUSER"),
+        passwd=os.environ.get("MYSQLPASSWORD"),
+        database=os.environ.get("MYSQLDATABASE"),
+        port=int(os.environ.get("MYSQLPORT"))
+    )
 
+# ---------------- CREATE TABLES (RUN ONCE) ----------------
+def init_db():
+    mycon = my_db()
+    cursor = mycon.cursor()
 
-mycon=my_db()
-cursor=mycon.cursor()
-cursor.execute('CREATE TABLE IF NOT EXISTS LOGIN(ID INT PRIMARY KEY AUTO_INCREMENT,GENDER VARCHAR(10),MOBILE BIGINT UNIQUE,PASSWORD VARCHAR(20),NAME VARCHAR(20),MAIL VARCHAR(50))AUTO_INCREMENT = 1000')
-cursor.execute('CREATE TABLE IF NOT EXISTS BOOKINGS(ID INT,NAME VARCHAR(20),BID INT PRIMARY KEY AUTO_INCREMENT,MOBILE BIGINT,DOC DATE,TOC TIME,TABLETYPE VARCHAR(30),REQUEST VARCHAR(500))AUTO_INCREMENT = 1000')
-cursor.execute('CREATE TABLE IF NOT EXISTS FEEDBACKS(FID INT PRIMARY KEY AUTO_INCREMENT, ID INT,NAME VARCHAR(20),MOBILE BIGINT,RATE INT,FEEDBACK VARCHAR(500))AUTO_INCREMENT = 1000')
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS LOGIN(
+        ID INT PRIMARY KEY AUTO_INCREMENT,
+        GENDER VARCHAR(10),
+        MOBILE BIGINT UNIQUE,
+        PASSWORD VARCHAR(20),
+        NAME VARCHAR(20),
+        MAIL VARCHAR(50)
+    ) AUTO_INCREMENT=1000
+    """)
 
-app=Flask(__name__)
-app.secret_key='123'
-app.permanent_session_lifetime=timedelta(days=1)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS BOOKINGS(
+        ID INT,
+        NAME VARCHAR(20),
+        BID INT PRIMARY KEY AUTO_INCREMENT,
+        MOBILE BIGINT,
+        DOC DATE,
+        TOC TIME,
+        TABLETYPE VARCHAR(30),
+        REQUEST VARCHAR(500)
+    ) AUTO_INCREMENT=1000
+    """)
 
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS FEEDBACKS(
+        FID INT PRIMARY KEY AUTO_INCREMENT,
+        ID INT,
+        NAME VARCHAR(20),
+        MOBILE BIGINT,
+        RATE INT,
+        FEEDBACK VARCHAR(500)
+    ) AUTO_INCREMENT=1000
+    """)
+
+    mycon.commit()
+    mycon.close()
+
+# ---------------- FLASK APP ----------------
+app = Flask(__name__)
+app.secret_key = '123'
+app.permanent_session_lifetime = timedelta(days=1)
+
+# ---------------- LOGIN CHECK DECORATOR ----------------
 def checklogin(f):
-    def wrapper(*args,**kwargs):
+    def wrapper(*args, **kwargs):
         if 'userid' in session:
-            return f(*args,**kwargs)
+            return f(*args, **kwargs)
         return redirect(url_for('bookingload'))
-    wrapper.__name__=f.__name__
+    wrapper.__name__ = f.__name__
     return wrapper
 
-
+# ---------------- ROUTES ----------------
 @app.route('/')
 def homepage():
     return render_template('hote.html')
@@ -35,95 +79,91 @@ def homepage():
 def bookingload():
     return render_template('hotelloginpage.html')
 
-@app.route('/register',methods=['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def reg():
     return render_template('register.html')
-
 
 @app.route('/dashboard')
 @checklogin
 def dash():
-    return render_template('dashboard.html',n=session['name'])
+    return render_template('dashboard.html', n=session['name'])
 
-
-@app.route('/check',methods=['POST'])
+@app.route('/check', methods=['POST'])
 def check():
-    data=request.get_json()
-    mycon=my_db()
-    cursor=mycon.cursor()
-    cursor.execute('SELECT * FROM LOGIN WHERE MOBILE=%s',(data['mob'],))
-    entry=cursor.fetchone()
-    response={'mobexist':0,'passmatch':0}
+    data = request.get_json()
+    mycon = my_db()
+    cursor = mycon.cursor()
+    cursor.execute('SELECT * FROM LOGIN WHERE MOBILE=%s', (data['mob'],))
+    entry = cursor.fetchone()
+
+    response = {'mobexist': 0, 'passmatch': 0}
     if entry:
-        response['mobexist']=1
-        if int(entry[3])==int(data['pass']):
-            session['userid']=entry[0]
-            session['name']=entry[4]
-            response['passmatch']=1
+        response['mobexist'] = 1
+        if int(entry[3]) == int(data['pass']):
+            session['userid'] = entry[0]
+            session['name'] = entry[4]
+            response['passmatch'] = 1
     return jsonify(response)
 
-
-@app.route('/add',methods=['POST'])
+@app.route('/add', methods=['POST'])
 def adding():
-        data=request.get_json()
-        mycon=my_db()
-        cursor=mycon.cursor()
-        cursor.execute('SELECT * FROM LOGIN WHERE MOBILE=%s',(data['mob'],))
-        entry=cursor.fetchone()
-        if entry:
-            return jsonify({'success':False})
-        cursor.execute('INSERT INTO LOGIN(GENDER,MOBILE,PASSWORD,NAME,MAIL) VALUES(%s,%s,%s,%s,%s)',(data['gender'],data['mob'],data['pass'],data['name'],data['mail'],))
-        mycon.commit()
-        return jsonify({'success':True})
+    data = request.get_json()
+    mycon = my_db()
+    cursor = mycon.cursor()
+    cursor.execute('SELECT * FROM LOGIN WHERE MOBILE=%s', (data['mob'],))
+    if cursor.fetchone():
+        return jsonify({'success': False})
 
+    cursor.execute(
+        'INSERT INTO LOGIN(GENDER,MOBILE,PASSWORD,NAME,MAIL) VALUES(%s,%s,%s,%s,%s)',
+        (data['gender'], data['mob'], data['pass'], data['name'], data['mail'])
+    )
+    mycon.commit()
+    return jsonify({'success': True})
 
 @app.route('/bookpage')
 @checklogin
 def bookpage():
     return render_template('booking.html')
 
-
-@app.route('/booking',methods=['POST'])
+@app.route('/booking', methods=['POST'])
 @checklogin
 def booking():
-    data=request.form
-    mycon=my_db()
-    cursor=mycon.cursor()
+    data = request.form
+    mycon = my_db()
+    cursor = mycon.cursor()
     cursor.execute(
-    'INSERT INTO BOOKINGS(ID,NAME,MOBILE,DOC,TOC ,TABLETYPE,REQUEST) VALUES(%s,%s,%s,%s,%s,%s,%s)'
-    ,(session['userid'],data['name'],data['mob'],data['doc'],data['time'],data['type'],data['req'])
+        'INSERT INTO BOOKINGS(ID,NAME,MOBILE,DOC,TOC,TABLETYPE,REQUEST) VALUES(%s,%s,%s,%s,%s,%s,%s)',
+        (session['userid'], data['name'], data['mob'], data['doc'], data['time'], data['type'], data['req'])
     )
     mycon.commit()
     return redirect(url_for('dash'))
 
-
 @app.route('/history')
 @checklogin
 def history():
-    mycon=my_db()
-    cursor=mycon.cursor()
-    cursor.execute('SELECT * FROM BOOKINGS WHERE ID = %s',(session['userid'],))
-    data=cursor.fetchall()
-    d=[]    
-    for i in data:
-        d.append(list(i[1:]))
-    print(d)
-    return render_template('historybook.html',d=d)
-
+    mycon = my_db()
+    cursor = mycon.cursor()
+    cursor.execute('SELECT * FROM BOOKINGS WHERE ID=%s', (session['userid'],))
+    data = cursor.fetchall()
+    d = [list(i[1:]) for i in data]
+    return render_template('historybook.html', d=d)
 
 @app.route('/feedback')
 @checklogin
 def fedd():
     return render_template('feedback.html')
 
-
-@app.route('/feedsave',methods=['POST'])
+@app.route('/feedsave', methods=['POST'])
 @checklogin
 def fed():
-    mycon=my_db()
-    cursor=mycon.cursor()
-    data=request.form
-    cursor.execute('INSERT INTO FEEDBACKS(ID,NAME,MOBILE,RATE,FEEDBACK) VALUES(%s,%s,%s,%s,%s)',(session['userid'],data['name'],data['mob'],data['rating'],data['message']))
+    data = request.form
+    mycon = my_db()
+    cursor = mycon.cursor()
+    cursor.execute(
+        'INSERT INTO FEEDBACKS(ID,NAME,MOBILE,RATE,FEEDBACK) VALUES(%s,%s,%s,%s,%s)',
+        (session['userid'], data['name'], data['mob'], data['rating'], data['message'])
+    )
     mycon.commit()
     return redirect(url_for('dash'))
 
@@ -142,56 +182,51 @@ def add_no_cache_headers(response):
 @app.route('/profile')
 @checklogin
 def profile():
-    mycon=my_db()
-    cursor=mycon.cursor()
-    cursor.execute('SELECT * FROM LOGIN WHERE ID=%s',(session['userid'],))
-    t=list(cursor.fetchone())
-    cursor.execute('SELECT * FROM FEEDBACKS WHERE ID=%s',(session['userid'],))
-    f=len(cursor.fetchall())
-    cursor.execute('SELECT * FROM BOOKINGS WHERE ID=%s',(session['userid'],))
-    b=len(cursor.fetchall())
-    t.extend([f,b])
-    print(t)
-    return render_template('profile.html',t=t)
+    mycon = my_db()
+    cursor = mycon.cursor()
+    cursor.execute('SELECT * FROM LOGIN WHERE ID=%s', (session['userid'],))
+    t = list(cursor.fetchone())
 
-@app.route('/changeprofile',methods=['POST'])
+    cursor.execute('SELECT * FROM FEEDBACKS WHERE ID=%s', (session['userid'],))
+    f = len(cursor.fetchall())
+
+    cursor.execute('SELECT * FROM BOOKINGS WHERE ID=%s', (session['userid'],))
+    b = len(cursor.fetchall())
+
+    t.extend([f, b])
+    return render_template('profile.html', t=t)
+
+@app.route('/changeprofile', methods=['POST'])
 @checklogin
 def edit():
-    mycon=my_db()
-    cursor=mycon.cursor()
-    data=request.form
-    prompt='UPDATE LOGIN SET '
-    c=0
-    k=[]
-    for i in data:
-        if c!=0:
-            prompt+=','
-        prompt+=f'{i.upper()}=%s'
-        if i=='mobile':
-            k.append(int(data[i]))
-        else:
-            k.append(data[i])
-        c+=1
-    print(prompt)
-    cursor.execute(prompt+' WHERE ID =%s',tuple(k)+(session['userid'],))
+    data = request.form
+    mycon = my_db()
+    cursor = mycon.cursor()
+
+    prompt = 'UPDATE LOGIN SET '
+    values = []
+    for i, key in enumerate(data):
+        if i != 0:
+            prompt += ','
+        prompt += f'{key.upper()}=%s'
+        values.append(int(data[key]) if key == 'mobile' else data[key])
+
+    cursor.execute(prompt + ' WHERE ID=%s', tuple(values) + (session['userid'],))
     mycon.commit()
-    session['name']=data['name']
+    session['name'] = data['name']
     return redirect(url_for('profile'))
 
 @app.route('/editprofile')
 @checklogin
 def cedit():
-    mycon=my_db()
-    cursor=mycon.cursor()
-    cursor.execute('SELECT * FROM LOGIN WHERE ID=%s',(session['userid'],))
-    data=cursor.fetchone()
-    return render_template('editprofile.html',d=data)
+    mycon = my_db()
+    cursor = mycon.cursor()
+    cursor.execute('SELECT * FROM LOGIN WHERE ID=%s', (session['userid'],))
+    data = cursor.fetchone()
+    return render_template('editprofile.html', d=data)
 
-
-
+# ---------------- RUN APP ----------------
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))  # Use PORT from environment, fallback to 5000 locally
-    app.run(host="0.0.0.0", port=port,debug=True)
-
-
-
+    init_db()
+    port = int(os.environ.get("PORT", 8000))
+    app.run(host="0.0.0.0", port=port)
