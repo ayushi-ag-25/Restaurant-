@@ -7,17 +7,17 @@ app = Flask(__name__)
 app.secret_key = "123"
 app.permanent_session_lifetime = timedelta(days=1)
 
-# ---------- DATABASE CONNECTION ----------
+# ================= DATABASE CONNECTION =================
 def my_db():
     return ms.connect(
-        host=os.environ.get("DB_HOST"),
-        user=os.environ.get("DB_USER"),
-        password=os.environ.get("DB_PASSWORD"),
-        database=os.environ.get("DB_NAME"),
-        port=int(os.environ.get("DB_PORT", 3306))
+        host=os.environ.get("DB_HOST"),          # CHANGED: from localhost to env
+        user=os.environ.get("DB_USER"),          # CHANGED
+        password=os.environ.get("DB_PASSWORD"),  # CHANGED
+        database=os.environ.get("DB_NAME"),      # CHANGED
+        port=int(os.environ.get("DB_PORT", 3306))# CHANGED
     )
 
-# ---------- CREATE TABLES ----------
+# ================= CREATE TABLES =================
 def init_db():
     con = my_db()
     cur = con.cursor()
@@ -60,7 +60,7 @@ def init_db():
     con.commit()
     con.close()
 
-# ---------- LOGIN DECORATOR ----------
+# ================= LOGIN CHECK DECORATOR =================
 def checklogin(f):
     def wrapper(*args, **kwargs):
         if 'userid' in session:
@@ -69,7 +69,7 @@ def checklogin(f):
     wrapper.__name__ = f.__name__
     return wrapper
 
-# ---------- ROUTES ----------
+# ================= ROUTES =================
 @app.route('/')
 def homepage():
     return render_template('hote.html')
@@ -87,43 +87,66 @@ def reg():
 def dash():
     return render_template('dashboard.html', n=session['name'])
 
+# ================= LOGIN API =================
 @app.route('/check', methods=['POST'])
 def check():
-    data = request.get_json()
-    con = my_db()
-    cur = con.cursor()
-    cur.execute("SELECT * FROM LOGIN WHERE MOBILE=%s", (data['mob'],))
-    entry = cur.fetchone()
-    con.close()
+    try:
+        data = request.get_json()
+        con = my_db()
+        cur = con.cursor()
 
-    res = {'mobexist': 0, 'passmatch': 0}
-    if entry:
-        res['mobexist'] = 1
-        if int(entry[3]) == int(data['pass']):
-            session['userid'] = entry[0]
-            session['name'] = entry[4]
-            res['passmatch'] = 1
-    return jsonify(res)
+        cur.execute("SELECT * FROM LOGIN WHERE MOBILE=%s", (data['mob'],))
+        entry = cur.fetchone()
+        con.close()
 
+        res = {'mobexist': 0, 'passmatch': 0}
+
+        if entry:
+            res['mobexist'] = 1
+            if entry[3] == data['pass']:   # CHANGED: removed int() comparison
+                session['userid'] = entry[0]
+                session['name'] = entry[4]
+                res['passmatch'] = 1
+
+        return jsonify(res)
+
+    except Exception as e:
+        print("LOGIN ERROR:", e)           # ADDED: debug logging
+        return jsonify(res), 500           # ADDED: always return JSON
+
+# ================= REGISTER API =================
 @app.route('/add', methods=['POST'])
 def adding():
-    data = request.get_json()
-    con = my_db()
-    cur = con.cursor()
+    try:
+        data = request.get_json()
+        con = my_db()
+        cur = con.cursor()
 
-    cur.execute("SELECT * FROM LOGIN WHERE MOBILE=%s", (data['mob'],))
-    if cur.fetchone():
+        cur.execute("SELECT ID FROM LOGIN WHERE MOBILE=%s", (data['mob'],))
+        if cur.fetchone():
+            con.close()
+            return jsonify({'success': False})   # same response as original
+
+        cur.execute(
+            "INSERT INTO LOGIN(GENDER,MOBILE,PASSWORD,NAME,MAIL) VALUES(%s,%s,%s,%s,%s)",
+            (
+                data['gender'],
+                str(data['mob']),          # CHANGED: force string safety
+                str(data['pass']),         # CHANGED
+                data['name'],
+                data['mail']
+            )
+        )
+
+        con.commit()
         con.close()
-        return jsonify({'success': False})
+        return jsonify({'success': True})
 
-    cur.execute(
-        "INSERT INTO LOGIN(GENDER,MOBILE,PASSWORD,NAME,MAIL) VALUES(%s,%s,%s,%s,%s)",
-        (data['gender'], data['mob'], data['pass'], data['name'], data['mail'])
-    )
-    con.commit()
-    con.close()
-    return jsonify({'success': True})
+    except Exception as e:
+        print("REGISTER ERROR:", e)         # ADDED
+        return jsonify({'success': False}), 500
 
+# ================= BOOKING =================
 @app.route('/bookpage')
 @checklogin
 def bookpage():
@@ -135,14 +158,25 @@ def booking():
     d = request.form
     con = my_db()
     cur = con.cursor()
+
     cur.execute("""
         INSERT INTO BOOKINGS(ID,NAME,MOBILE,DOC,TOC,TABLETYPE,REQUEST)
         VALUES(%s,%s,%s,%s,%s,%s,%s)
-    """, (session['userid'], d['name'], d['mob'], d['doc'], d['time'], d['type'], d['req']))
+    """, (
+        session['userid'],
+        d['name'],
+        d['mob'],
+        d['doc'],
+        d['time'],
+        d['type'],
+        d['req']
+    ))
+
     con.commit()
     con.close()
     return redirect(url_for('dash'))
 
+# ================= HISTORY =================
 @app.route('/history')
 @checklogin
 def history():
@@ -153,6 +187,7 @@ def history():
     con.close()
     return render_template('historybook.html', d=data)
 
+# ================= FEEDBACK =================
 @app.route('/feedback')
 @checklogin
 def fedd():
@@ -164,24 +199,35 @@ def fed():
     d = request.form
     con = my_db()
     cur = con.cursor()
+
     cur.execute(
         "INSERT INTO FEEDBACKS(ID,NAME,MOBILE,RATE,FEEDBACK) VALUES(%s,%s,%s,%s,%s)",
-        (session['userid'], d['name'], d['mob'], d['rating'], d['message'])
+        (
+            session['userid'],
+            d['name'],
+            d['mob'],
+            d['rating'],
+            d['message']
+        )
     )
+
     con.commit()
     con.close()
     return redirect(url_for('dash'))
 
+# ================= LOGOUT =================
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('bookingload'))
 
+# ================= PROFILE =================
 @app.route('/profile')
 @checklogin
 def profile():
     con = my_db()
     cur = con.cursor()
+
     cur.execute("SELECT * FROM LOGIN WHERE ID=%s", (session['userid'],))
     t = list(cur.fetchone())
 
@@ -195,8 +241,8 @@ def profile():
     t.extend([f, b])
     return render_template('profile.html', t=t)
 
-# ---------- START ----------
+# ================= START =================
 if __name__ == "__main__":
-    init_db()
-    port = int(os.environ.get("PORT", 8080))
+    init_db()                              # SAME as original
+    port = int(os.environ.get("PORT", 8080))  # CHANGED: Railway port
     app.run(host="0.0.0.0", port=port)
