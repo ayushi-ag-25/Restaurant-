@@ -247,6 +247,39 @@ def profile():
     t.extend([f, b])
     return render_template('profile.html', t=t)
 
+@app.route('/changeprofile',methods=['POST'])
+@checklogin
+def edit():
+    mycon=my_db()
+    cursor=mycon.cursor()
+    data=request.form
+    prompt='UPDATE LOGIN SET '
+    c=0
+    k=[]
+    for i in data:
+        if c!=0:
+            prompt+=','
+        prompt+=f'{i.upper()}=%s'
+        if i=='mobile':
+            k.append(int(data[i]))
+        else:
+            k.append(data[i])
+        c+=1
+    print(prompt)
+    cursor.execute(prompt+' WHERE ID =%s',tuple(k)+(session['userid'],))
+    mycon.commit()
+    session['name']=data['name']
+    return redirect(url_for('profile'))
+
+@app.route('/editprofile')
+@checklogin
+def cedit():
+    mycon=my_db()
+    cursor=mycon.cursor()
+    cursor.execute('SELECT * FROM LOGIN WHERE ID=%s',(session['userid'],))
+    data=cursor.fetchone()
+    return render_template('editprofile.html',d=data)
+
 # ---------------- START ----------------
 init_db()  # run this for Railway/Gunicorn B 
 
