@@ -134,6 +134,18 @@
         nam = document.getElementById('name').value
         let genderElem = document.querySelector('#gen:checked');
         let gender = genderElem ? genderElem.value : null;
+        if  (!mob || !mail || !pass || !nam || !gender){
+            mess.textContent='All fields are required';
+            return false
+        }
+        if (mob.length != 10) {
+            mess.textContent = 'Invalid mobile no.';
+            return false
+        }
+        if (pass.length < 6) {
+            mess.textContent = 'Password must be at least 6 characters long';
+            return false
+        }
         fetch('/add',
             {
                 method: "POST",

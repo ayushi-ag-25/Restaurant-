@@ -122,6 +122,14 @@
         event.preventDefault();
         u=document.getElementById('username1').value
         p=document.getElementById('pass1').value
+        if (!u || !p){
+            mess.textContent='All fields are required';
+            return false
+        }
+        if (u.length!=10){
+            mess.textContent='Invalid mobile no.';
+            return false
+        }
         fetch('/check',{method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({'mob':u,'pass':p})
