@@ -131,7 +131,7 @@ def adding():
     try:
         data = request.get_json()
         if not data:
-            return jsonify({'success': False}), 400
+            return jsonify({'success': False, 'exist': 'empty data'}), 400
 
         con = my_db()
         cur = con.cursor()
@@ -139,7 +139,7 @@ def adding():
         # check if mobile already exists
         cur.execute("SELECT ID FROM LOGIN WHERE MOBILE=%s", (str(data['mob']),))
         if cur.fetchone():
-            return jsonify({'success': False})
+            return jsonify({'success': False,'exist': True})
 
         # insert new user
         cur.execute("""

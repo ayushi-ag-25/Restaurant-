@@ -157,8 +157,11 @@
                 if (d['success']) {
                     window.location.href = '/book';
                 } else {
-                    mess.textContent = 'This mobile number is already registered'
-
+                    if (d['exist']) {
+                        mess.textContent = 'This mobile number is already registered';
+                    } else {
+                        mess.textContent = d['exist'] || 'Registration failed. Please try again.'; // Show specific error if available
+                    }
                 }
                 return false;
             })
