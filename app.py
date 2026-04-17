@@ -296,4 +296,8 @@ def add_no_cache_headers(response):
     response.headers['Expires'] = '0'
     return response
 
+@app.route("/init")
+def init():
+    init_db()
+    return "DB initialized"
 
