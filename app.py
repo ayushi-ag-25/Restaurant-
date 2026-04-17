@@ -1,7 +1,8 @@
 from flask import *
+import psycopg2
+from psycopg2.extras import RealDictCursor
 import os
 from datetime import timedelta
-import mysql.connector as ms
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "123")
@@ -9,13 +10,21 @@ app.permanent_session_lifetime = timedelta(days=1)
 
 # ---------------- DATABASE ----------------
 def my_db():
-    return ms.connect(
+    db_url = os.environ.get("DATABASE_URL")
+
+    if db_url.startswith("postgres://"):
+        db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+    return psycopg2.connect(db_url)
+
+#can replace below code with above have evrything in DATABASE_URL env variable in format: postgres://user:password@host:port/dbname
+'''return psycopg2.connect(
         host=os.environ.get("DB_HOST"),
         user=os.environ.get("DB_USER"),
         password=os.environ.get("DB_PASSWORD"),
-        database=os.environ.get("DB_NAME"),
-        port=int(os.environ.get("DB_PORT", 3306))
-    )
+        dbname=os.environ.get("DB_NAME"),
+        port=os.environ.get("DB_PORT", 5432)
+)'''
 
 # ---------------- INIT DB ----------------
 def init_db():
@@ -24,7 +33,7 @@ def init_db():
 
     cur.execute("""
     CREATE TABLE IF NOT EXISTS LOGIN(
-        ID INT PRIMARY KEY AUTO_INCREMENT,
+        ID SERIAL PRIMARY KEY,
         GENDER VARCHAR(10),
         MOBILE BIGINT UNIQUE,
         PASSWORD VARCHAR(50),
@@ -35,7 +44,7 @@ def init_db():
 
     cur.execute("""
     CREATE TABLE IF NOT EXISTS BOOKINGS(
-        BID INT PRIMARY KEY AUTO_INCREMENT,
+        BID SERIAL PRIMARY KEY,
         ID INT,
         NAME VARCHAR(20),
         MOBILE BIGINT,
@@ -48,7 +57,7 @@ def init_db():
 
     cur.execute("""
     CREATE TABLE IF NOT EXISTS FEEDBACKS(
-        FID INT PRIMARY KEY AUTO_INCREMENT,
+        FID SERIAL PRIMARY KEY,
         ID INT,
         NAME VARCHAR(20),
         MOBILE BIGINT,
@@ -96,7 +105,7 @@ def check():
             return jsonify({'mobexist': False, 'passmatch': False}), 400
 
         con = my_db()
-        cur = con.cursor(dictionary=True)
+        cur = con.cursor(cursor_factory=RealDictCursor)
         cur.execute("SELECT * FROM LOGIN WHERE MOBILE=%s", (data['mob'],))
         entry = cur.fetchone()
         con.close()
@@ -286,6 +295,5 @@ def add_no_cache_headers(response):
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
     return response
-# ---------------- START ----------------
-init_db()  # run this for Railway/Gunicorn B 
+
 
