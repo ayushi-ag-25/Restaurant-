@@ -115,8 +115,8 @@ def check():
         if entry:
             res['mobexist'] = True
             if entry['password'] == data['pass']:
-                session['userid'] = entry['ID']
-                session['name'] = entry['NAME']
+                session['userid'] = entry['id']
+                session['name'] = entry['name']
                 res['passmatch'] = True
 
         return jsonify(res)
