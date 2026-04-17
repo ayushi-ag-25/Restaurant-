@@ -114,7 +114,7 @@ def check():
 
         if entry:
             res['mobexist'] = True
-            if entry['PASSWORD'] == data['pass']:
+            if entry['password'] == data['pass']:
                 session['userid'] = entry['ID']
                 session['name'] = entry['NAME']
                 res['passmatch'] = True
